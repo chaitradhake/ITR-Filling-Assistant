@@ -122,9 +122,9 @@ export function calculateTax(income, regime, deductions = {}) {
   const totalTax = taxBeforeCess + cess;
 
   return {
-    taxableIncome,
-    taxBeforeCess,
-    cess,
-    totalTax
+    taxableIncome: Math.round(taxableIncome),
+    taxBeforeCess: Math.round(taxBeforeCess),
+    cess: Math.round(cess),
+    totalTax: Math.round(totalTax)
   };
 }
