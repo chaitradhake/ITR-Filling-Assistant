@@ -13,7 +13,7 @@ router.post('/calculate-tax', (req, res) => {
 
   // Call calculateTax for both regimes (old and new)
   // deductions default to {} inside calculateTax or if null/undefined
-  const deductionsObj = deductions && typeof deductions === 'object' ? deductions : {};
+  const deductionsObj = deductions !== undefined ? deductions : { section80C: 0, section80D: 0, hraExemption: 0, otherDeductions: 0 };
   const oldRegime = calculateTax(income, 'old', deductionsObj);
   const newRegime = calculateTax(income, 'new', deductionsObj);
 
