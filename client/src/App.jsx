@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import TaxCalculator from './components/TaxCalculator.jsx'
 
 function App() {
   const [status, setStatus] = useState('Loading...')
@@ -21,6 +22,7 @@ function App() {
   return (
     <div>
       Server status: {status}
+      <TaxCalculator />
     </div>
   )
 }
