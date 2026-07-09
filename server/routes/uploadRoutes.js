@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { extractForm16Data } from '../services/geminiExtraction.js';
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ const upload = multer({
 
 // POST route for file upload
 router.post('/upload', (req, res) => {
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: 'File size must be under 5MB' });
@@ -62,11 +63,21 @@ router.post('/upload', (req, res) => {
       return res.status(400).json({ error: 'Please upload a file' });
     }
 
-    return res.status(200).json({
-      message: 'File uploaded successfully',
-      filename: req.file.filename,
-      path: req.file.path
-    });
+    try {
+      const extractedData = await extractForm16Data(req.file.path, req.file.mimetype);
+      return res.status(200).json({
+        message: 'File uploaded and processed successfully',
+        filename: req.file.filename,
+        extractedData
+      });
+    } catch (extractionError) {
+      return res.status(200).json({
+        message: 'File uploaded successfully',
+        filename: req.file.filename,
+        path: req.file.path,
+        extractionError: extractionError.message
+      });
+    }
   });
 });
 
