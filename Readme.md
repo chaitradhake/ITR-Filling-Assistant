@@ -6,9 +6,9 @@ A MERN stack web app that helps salaried individuals in India compare the **Old 
 
 ## What this project does
 
-1. User uploads their Form 16 (PDF/image) *(planned)*
-2. AI (Gemini Vision API) extracts salary, TDS, and deduction details *(planned)*
-3. User reviews and corrects the extracted data *(planned)*
+1. User uploads their Form 16 (PDF/image) ✅ **built**
+2. AI (Gemini Vision API) extracts salary, TDS, and deduction details ✅ **built**
+3. User reviews and corrects the extracted data ✅ **built**
 4. App calculates tax under both Old and New regime using official FY 2025-26 slab rules ✅ **built**
 5. App shows a side-by-side comparison and recommends the better regime ✅ **built**
 
@@ -16,16 +16,19 @@ This is a **decision-support tool**, not an official tax filing service. It does
 
 ## Currently working
 
+- Full end-to-end flow: **upload Form 16 → AI extracts data → editable review screen → tax comparison**
 - Tax calculation engine (Old vs New regime, FY 2025-26 rules, Section 87A rebate, 4% cess)
 - `/api/calculate-tax` endpoint returning a full regime comparison
-- Frontend calculator UI — enter income & deductions, get an instant Old vs New comparison
-- File upload endpoint (`/api/upload`) accepting PDF/JPG/PNG, with type and size validation
+- `/api/upload` endpoint — accepts a Form 16 (PDF/JPG/PNG), validates type/size, and runs it through Gemini Vision to extract salary, TDS, and deduction details as structured JSON
+- Editable review screen — extracted values are pre-filled but fully editable before calculation, so users can correct any AI misreads
+- Manual entry calculator UI — enter income & deductions directly, get an instant Old vs New comparison
+- Tab navigation between "Upload Form 16" and "Enter Details Manually" flows
 
 ## Tech stack
 
 - **Frontend:** React (Vite), Tailwind CSS
 - **Backend:** Node.js, Express, Multer (file uploads)
-- **AI:** Google Gemini API (document/vision extraction) — integration in progress
+- **AI:** Google Gemini API (document/vision extraction of Form 16 data)
 - **Planned:** MongoDB (saving past calculations), JWT-based auth, recharts (comparison visuals)
 
 ## Project structure
@@ -35,15 +38,18 @@ itr-filing-assistant/
 ├── client/
 │   └── src/
 │       └── components/
-│           └── TaxCalculator.jsx   # Main calculator UI, wired to /api/calculate-tax
+│           ├── TaxCalculator.jsx    # Manual entry calculator UI, wired to /api/calculate-tax
+│           └── UploadForm16.jsx     # Upload → AI extraction → editable review → calculation flow
 ├── server/
 │   ├── routes/
-│   │   ├── taxRoutes.js           # /api/calculate-tax endpoint
-│   │   └── uploadRoutes.js        # /api/upload endpoint
+│   │   ├── taxRoutes.js            # /api/calculate-tax endpoint
+│   │   └── uploadRoutes.js         # /api/upload endpoint
+│   ├── services/
+│   │   └── geminiExtraction.js     # Sends uploaded document to Gemini, returns structured JSON
 │   ├── utils/
-│   │   ├── taxCalculator.js       # Old vs New regime tax logic
-│   │   └── taxCalculator.test.js  # Manual test cases (run with: node utils/taxCalculator.test.js)
-│   └── uploads/                   # Uploaded files (gitignored, not committed)
+│   │   ├── taxCalculator.js        # Old vs New regime tax logic
+│   │   └── taxCalculator.test.js   # Manual test cases (run with: node utils/taxCalculator.test.js)
+│   └── uploads/                    # Uploaded files (gitignored, not committed)
 └── README.md
 ```
 
@@ -54,6 +60,11 @@ itr-filing-assistant/
 cd server
 npm install
 npm run dev
+```
+Requires a `.env` file in `/server` with:
+```
+PORT=5000
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 **Client:**
@@ -94,16 +105,37 @@ npm run dev
 
 ### `POST /api/upload`
 
-Accepts a single file under the field name `form16`. Only PDF, JPG, and PNG files are accepted, up to 5MB.
+Accepts a single file under the field name `form16`. Only PDF, JPG, and PNG files are accepted, up to 5MB. The file is passed to Gemini Vision, which extracts key figures as structured JSON.
 
 **Response (success):**
 ```json
-{ "message": "File uploaded successfully", "filename": "...", "path": "..." }
+{
+  "message": "File uploaded and processed successfully",
+  "filename": "sampleform16-1234567890.pdf",
+  "extractedData": {
+    "grossSalary": 2557983,
+    "tdsDeducted": 483740,
+    "section80C": 150000,
+    "section80D": 0,
+    "hraExemption": 180150,
+    "otherDeductions": 0
+  }
+}
+```
+
+**Response (upload succeeds, extraction fails):**
+```json
+{
+  "message": "File uploaded and processed successfully",
+  "filename": "...",
+  "extractionError": "Failed to parse extracted data from document"
+}
 ```
 
 ## Known simplifications
 - Surcharge and marginal relief (only relevant above ₹50 lakh income) are not implemented in the current tax calculator — a deliberate scope decision for this stage of the project.
 - Section 87A rebate is implemented as a flat "nil tax below threshold" rule rather than the precise marginal-relief calculation right at the boundary.
+- AI extraction is not always perfectly accurate (e.g. it can occasionally bundle standard deduction or professional tax into "other deductions" instead of leaving it at 0) — this is exactly why the review screen lets users correct values before calculating, rather than trusting extraction blindly.
 
 ## Tax rules reference (FY 2025-26)
 
