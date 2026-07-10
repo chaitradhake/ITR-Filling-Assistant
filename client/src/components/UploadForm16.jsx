@@ -9,15 +9,15 @@ export default function UploadForm16() {
   const [extractedData, setExtractedData] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Helper to format currency in Indian Rupees (INR)
-  const formatCurrency = (amount) => {
-    if (amount === undefined || amount === null) return '₹0';
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
+  // Editable form state initialized empty
+  const [formData, setFormData] = useState({
+    grossSalary: '',
+    tdsDeducted: '',
+    section80C: '',
+    section80D: '',
+    hraExemption: '',
+    otherDeductions: ''
+  });
 
   const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
 
@@ -84,9 +84,37 @@ export default function UploadForm16() {
     setError('');
     setExtractionError('');
     setExtractedData(null);
+    setFormData({
+      grossSalary: '',
+      tdsDeducted: '',
+      section80C: '',
+      section80D: '',
+      hraExemption: '',
+      otherDeductions: ''
+    });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleConfirm = (e) => {
+    e.preventDefault();
+    const finalValues = {
+      grossSalary: Number(formData.grossSalary) || 0,
+      tdsDeducted: Number(formData.tdsDeducted) || 0,
+      section80C: Number(formData.section80C) || 0,
+      section80D: Number(formData.section80D) || 0,
+      hraExemption: Number(formData.hraExemption) || 0,
+      otherDeductions: Number(formData.otherDeductions) || 0
+    };
+    console.log('Confirmed Form 16 Values:', finalValues);
   };
 
   const handleUploadAndExtract = async (e) => {
@@ -98,8 +126,8 @@ export default function UploadForm16() {
     setExtractionError('');
     setExtractedData(null);
 
-    const formData = new FormData();
-    formData.append('form16', file);
+    const formDataObj = new FormData();
+    formDataObj.append('form16', file);
 
     try {
       let response;
@@ -107,14 +135,14 @@ export default function UploadForm16() {
         // Try direct call as required
         response = await fetch('http://localhost:5000/api/upload', {
           method: 'POST',
-          body: formData,
+          body: formDataObj,
         });
       } catch (directErr) {
         console.warn('Direct upload to http://localhost:5000 failed, trying Vite proxy fallback', directErr);
         // Fallback to proxy
         response = await fetch('/api/upload', {
           method: 'POST',
-          body: formData,
+          body: formDataObj,
         });
       }
 
@@ -129,6 +157,15 @@ export default function UploadForm16() {
         setExtractionError('We uploaded your file but couldn\'t extract the data automatically. Please enter your details manually.');
       } else if (data.extractedData) {
         setExtractedData(data.extractedData);
+        // Pre-fill editable form state with extracted values
+        setFormData({
+          grossSalary: data.extractedData.grossSalary ?? 0,
+          tdsDeducted: data.extractedData.tdsDeducted ?? 0,
+          section80C: data.extractedData.section80C ?? 0,
+          section80D: data.extractedData.section80D ?? 0,
+          hraExemption: data.extractedData.hraExemption ?? 0,
+          otherDeductions: data.extractedData.otherDeductions ?? 0
+        });
       } else {
         throw new Error('Invalid response structure from server.');
       }
@@ -138,16 +175,6 @@ export default function UploadForm16() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Nice friendly label names for the extracted keys
-  const fieldLabels = {
-    grossSalary: 'Gross Salary',
-    tdsDeducted: 'TDS Deducted',
-    section80C: 'Section 80C Deduction',
-    section80D: 'Section 80D Deduction',
-    hraExemption: 'HRA Exemption',
-    otherDeductions: 'Other Deductions (Chapter VI-A)'
   };
 
   return (
@@ -300,32 +327,120 @@ export default function UploadForm16() {
           )}
         </form>
 
-        {/* Temporary Extracted Data List */}
+        {/* Editable Review Form */}
         {extractedData && (
           <div className="mt-xl border-t border-outline-variant/30 pt-lg space-y-md">
             <div>
-              <h4 className="text-body-lg font-semibold text-on-surface flex items-center gap-xs">
-                <span className="material-symbols-outlined text-green-600 text-xl">check_circle</span>
-                Extracted Information
+              <h4 className="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+                <span className="material-symbols-outlined text-green-600 text-2xl">check_circle</span>
+                Review Your Information
               </h4>
-              <p className="text-xs text-on-surface-variant mt-0.5">
-                Below is the raw extracted data from your Form 16.
+              <p className="text-body-sm text-on-surface-variant mt-xs">
+                We've extracted these details from your Form 16. Please review and correct anything if needed.
               </p>
             </div>
 
-            <div className="bg-surface-container rounded-2xl p-md border border-outline-variant/40 divide-y divide-outline-variant/30">
-              {Object.entries(fieldLabels).map(([key, label]) => {
-                const val = extractedData[key];
-                return (
-                  <div key={key} className="flex justify-between py-sm text-body-sm first:pt-0 last:pb-0">
-                    <span className="text-on-surface-variant font-medium">{label}</span>
-                    <span className="text-on-surface font-semibold text-right">
-                      {formatCurrency(val)}
-                    </span>
-                  </div>
-                );
-              })}
+            {/* Small Info Note */}
+            <div className="p-md bg-surface-container-low border border-outline-variant/30 rounded-xl flex items-start gap-sm text-body-sm text-on-surface-variant">
+              <span className="material-symbols-outlined text-primary shrink-0">info</span>
+              <span>Please double-check these values before proceeding — automated extraction can occasionally misread documents.</span>
             </div>
+
+            <form onSubmit={handleConfirm} className="space-y-lg mt-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                {/* Gross Salary */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">Gross Salary (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.grossSalary}
+                    onChange={(e) => handleInputChange('grossSalary', e.target.value)}
+                    placeholder="e.g. 800000"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                {/* TDS Deducted */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">TDS Deducted (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.tdsDeducted}
+                    onChange={(e) => handleInputChange('tdsDeducted', e.target.value)}
+                    placeholder="e.g. 45000"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                {/* Section 80C */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">Section 80C Deduction (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.section80C}
+                    onChange={(e) => handleInputChange('section80C', e.target.value)}
+                    placeholder="e.g. 150000"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                {/* Section 80D */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">Section 80D Deduction (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.section80D}
+                    onChange={(e) => handleInputChange('section80D', e.target.value)}
+                    placeholder="e.g. 25000"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                {/* HRA Exemption */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">HRA Exemption (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.hraExemption}
+                    onChange={(e) => handleInputChange('hraExemption', e.target.value)}
+                    placeholder="e.g. 50000"
+                    min="0"
+                    required
+                  />
+                </div>
+
+                {/* Other Deductions */}
+                <div>
+                  <label className="block text-label-md font-label-md mb-2 text-on-surface">Other Deductions (Chapter VI-A) (₹)</label>
+                  <input
+                    type="number"
+                    className="w-full h-12 bg-surface-bright border border-outline-variant rounded-xl px-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    value={formData.otherDeductions}
+                    onChange={(e) => handleInputChange('otherDeductions', e.target.value)}
+                    placeholder="e.g. 10000"
+                    min="0"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full h-12 bg-primary hover:bg-primary-container text-white font-semibold rounded-2xl flex items-center justify-center gap-sm transition-colors shadow-md shadow-primary/10 mt-lg"
+              >
+                <span className="material-symbols-outlined text-xl font-normal">task_alt</span>
+                Confirm & Calculate Tax
+              </button>
+            </form>
           </div>
         )}
       </div>
