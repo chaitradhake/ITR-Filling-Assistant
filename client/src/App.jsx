@@ -6,6 +6,7 @@ import Hero from './components/Hero.jsx';
 import WhyChoose from './components/WhyChoose.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
 import FAQ from './components/FAQ.jsx';
+import CtaBanner from './components/CtaBanner.jsx';
 
 function App() {
   const [status, setStatus] = useState('Loading...');
@@ -33,6 +34,7 @@ function App() {
       <WhyChoose />
       <HowItWorks />
       <FAQ />
+      <CtaBanner />
       {/* Top Banner / Navbar */}
       <header className="border-b border-outline-variant/20 bg-surface-bright py-md shadow-sm">
         <div className="max-w-container-max mx-auto px-gutter flex justify-between items-center">
