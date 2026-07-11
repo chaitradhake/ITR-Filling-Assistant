@@ -5,6 +5,7 @@ import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import WhyChoose from './components/WhyChoose.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
+import FAQ from './components/FAQ.jsx';
 
 function App() {
   const [status, setStatus] = useState('Loading...');
@@ -31,6 +32,7 @@ function App() {
       <Hero />
       <WhyChoose />
       <HowItWorks />
+      <FAQ />
       {/* Top Banner / Navbar */}
       <header className="border-b border-outline-variant/20 bg-surface-bright py-md shadow-sm">
         <div className="max-w-container-max mx-auto px-gutter flex justify-between items-center">
