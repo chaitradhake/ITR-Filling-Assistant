@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import TaxCalculator from './components/TaxCalculator.jsx';
 import UploadForm16 from './components/UploadForm16.jsx';
+import Navbar from './components/Navbar.jsx';
 
 function App() {
   const [status, setStatus] = useState('Loading...');
@@ -22,7 +23,8 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-surface-container-low/30 font-sans">
+    <div className="min-h-screen bg-surface-container-low/30 font-sans pt-16">
+      <Navbar />
       {/* Top Banner / Navbar */}
       <header className="border-b border-outline-variant/20 bg-surface-bright py-md shadow-sm">
         <div className="max-w-container-max mx-auto px-gutter flex justify-between items-center">
