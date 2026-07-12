@@ -1,5 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 const router = express.Router();
@@ -39,6 +40,49 @@ router.post('/signup', async (req, res) => {
     });
   } catch (error) {
     console.error('Error during signup:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate email and password are present
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Compare the provided password against the stored hash
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT signed with JWT_SECRET, containing user's id, expiring in 7 days
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Return 200 with success message, token, and user info (excluding password/hash)
+    return res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
