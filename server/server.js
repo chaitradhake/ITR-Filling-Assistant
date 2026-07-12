@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import taxRouter from './routes/taxRoutes.js';
 import uploadRouter from './routes/uploadRoutes.js';
+import authRouter from './routes/authRoutes.js';
 import { connectDB } from './config/db.js';
 
 dotenv.config();
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use('/api', taxRouter);
 app.use('/api', uploadRouter);
+app.use('/api/auth', authRouter);
 
 // Test route
 app.get('/api/health', (req, res) => {
