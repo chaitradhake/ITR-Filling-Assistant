@@ -67,7 +67,7 @@ export default function Navbar({ onShowLogin, onShowSignup, onShowMain, onShowHi
             <>
               <div className="flex items-center gap-xs text-on-surface-variant font-medium text-body-sm font-sans bg-surface-container-low px-sm py-1.5 rounded-xl border border-outline-variant/35 shadow-xs">
                 <span className="material-symbols-outlined text-primary text-lg">person</span>
-                <span className="max-w-[120px] truncate">{user.name}</span>
+                <span className="max-w-[120px] truncate hidden sm:inline">{user.name}</span>
               </div>
               <button 
                 onClick={logout}

@@ -61,14 +61,16 @@ function AppContent() {
 
           {/* Top Banner / Navbar */}
           <header className="border-b border-outline-variant/20 bg-surface-bright py-md shadow-sm">
-            <div className="max-w-container-max mx-auto px-gutter flex justify-between items-center">
+            <div className="max-w-container-max mx-auto px-gutter flex justify-between items-center gap-md">
               <div className="flex items-center gap-sm">
                 <span className="material-symbols-outlined text-primary text-3xl font-normal">account_balance_wallet</span>
                 <h1 className="font-headline-md text-headline-md text-on-surface tracking-tight">ITR Assistant</h1>
               </div>
-              <div className="flex items-center gap-xs text-body-sm">
-                <span className={`h-2.5 w-2.5 rounded-full ${status === 'healthy' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`}></span>
-                <span className="text-on-surface-variant font-medium text-xs md:text-sm">Server status: {status}</span>
+              <div className="flex items-center gap-xs text-body-sm min-w-0">
+                <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${status === 'healthy' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`}></span>
+                <span className="text-on-surface-variant font-medium text-xs md:text-sm truncate">
+                  <span className="hidden sm:inline">Server status: </span>{status}
+                </span>
               </div>
             </div>
           </header>
@@ -78,10 +80,10 @@ function AppContent() {
             <div className="max-w-container-max mx-auto px-gutter flex flex-col items-center">
               
               {/* Tab Selector Toggle */}
-              <div className="bg-surface-container p-xs rounded-2xl flex items-center mb-xl shadow-sm border border-outline-variant/30">
+              <div className="bg-surface-container p-xs rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto mb-xl shadow-sm border border-outline-variant/30">
                 <button
                   onClick={() => setActiveTab('upload')}
-                  className={`flex items-center gap-xs px-lg py-md rounded-xl font-semibold transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-xs px-md sm:px-lg py-md rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto ${
                     activeTab === 'upload'
                       ? 'bg-primary text-white shadow-md shadow-primary/10'
                       : 'text-on-surface-variant hover:text-on-surface'
@@ -92,7 +94,7 @@ function AppContent() {
                 </button>
                 <button
                   onClick={() => setActiveTab('manual')}
-                  className={`flex items-center gap-xs px-lg py-md rounded-xl font-semibold transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-xs px-md sm:px-lg py-md rounded-xl font-semibold transition-all duration-200 w-full sm:w-auto ${
                     activeTab === 'manual'
                       ? 'bg-primary text-white shadow-md shadow-primary/10'
                       : 'text-on-surface-variant hover:text-on-surface'

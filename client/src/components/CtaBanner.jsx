@@ -14,7 +14,7 @@ export default function CtaBanner() {
         </div>
         <a
           href="#calculator"
-          className="inline-flex items-center gap-xs px-2xl py-md bg-white text-primary rounded-full font-headline-md text-body-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition duration-200 group whitespace-nowrap self-start md:self-auto"
+          className="inline-flex items-center gap-xs px-xl md:px-2xl py-md bg-white text-primary rounded-full font-headline-md text-body-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition duration-200 group whitespace-nowrap self-start md:self-auto"
         >
           Calculate Now
           <span className="material-symbols-outlined transition-transform duration-200 group-hover:translate-x-1">

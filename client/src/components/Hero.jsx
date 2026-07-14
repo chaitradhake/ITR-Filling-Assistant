@@ -29,7 +29,7 @@ export default function Hero() {
               <span className="text-label-md font-label-md">Instant Results</span>
             </div>
           </div>
-          <a className="inline-flex items-center gap-2 px-2xl py-md bg-primary text-on-primary rounded-full font-headline-md text-body-lg shadow-xl shadow-primary/25 hover:scale-[1.02] transition-transform" href="#calculator">
+          <a className="inline-flex items-center gap-2 px-xl sm:px-2xl py-md bg-primary text-on-primary rounded-full font-headline-md text-body-lg shadow-xl shadow-primary/25 hover:scale-[1.02] transition-transform" href="#calculator">
             Calculate Your Savings
             <span className="material-symbols-outlined">arrow_forward</span>
           </a>
