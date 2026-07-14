@@ -25,6 +25,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled Server Error:', err);
+  res.status(500).json({ error: 'Something went wrong on the server' });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

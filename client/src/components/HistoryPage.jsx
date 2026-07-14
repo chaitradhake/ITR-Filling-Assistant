@@ -62,7 +62,11 @@ export default function HistoryPage() {
         setCalculations(data);
       } catch (err) {
         console.error('Error fetching history:', err);
-        setError(err.message || 'Unable to connect to the server.');
+        if (err.name === 'TypeError' || err.message?.includes('fetch') || err.message?.includes('NetworkError') || err.message?.includes('Failed to fetch')) {
+          setError('Unable to connect to the server. Please try again later.');
+        } else {
+          setError(err.message || 'Unable to connect to the server.');
+        }
       } finally {
         setLoading(false);
       }

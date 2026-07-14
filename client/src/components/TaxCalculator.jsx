@@ -73,7 +73,11 @@ export default function TaxCalculator() {
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error('Error saving calculation:', err);
-      setSaveError(err.message || 'Failed to save calculation.');
+      if (err.name === 'TypeError' || err.message?.includes('fetch') || err.message?.includes('NetworkError') || err.message?.includes('Failed to fetch')) {
+        setSaveError('Unable to connect to the server. Please try again later.');
+      } else {
+        setSaveError(err.message || 'Failed to save calculation.');
+      }
     } finally {
       setSaveLoading(false);
     }
@@ -161,7 +165,11 @@ export default function TaxCalculator() {
       setResults(data);
     } catch (err) {
       console.error('Calculation error:', err);
-      setError(err.message || 'Unable to connect to the tax calculation server.');
+      if (err.name === 'TypeError' || err.message?.includes('fetch') || err.message?.includes('NetworkError') || err.message?.includes('Failed to fetch')) {
+        setError('Unable to connect to the server. Please try again later.');
+      } else {
+        setError(err.message || 'Unable to connect to the tax calculation server.');
+      }
     } finally {
       setLoading(false);
     }
