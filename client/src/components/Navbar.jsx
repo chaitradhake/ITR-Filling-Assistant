@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-export default function Navbar({ onShowLogin, onShowSignup, onShowMain }) {
+export default function Navbar({ onShowLogin, onShowSignup, onShowMain, onShowHistory }) {
   const { user, logout } = useAuth();
 
   return (
@@ -52,6 +52,15 @@ export default function Navbar({ onShowLogin, onShowSignup, onShowMain }) {
           >
             FAQ
           </a>
+          {user && (
+            <a 
+              onClick={(e) => { e.preventDefault(); onShowHistory(); }}
+              className="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" 
+              href="#history"
+            >
+              History
+            </a>
+          )}
         </nav>
         <div className="flex items-center gap-md">
           {user ? (

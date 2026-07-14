@@ -11,6 +11,7 @@ import Footer from './components/Footer.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import SignupPage from './components/SignupPage.jsx';
 import LoginPage from './components/LoginPage.jsx';
+import HistoryPage from './components/HistoryPage.jsx';
 
 function AppContent() {
   const [status, setStatus] = useState('Loading...');
@@ -38,6 +39,7 @@ function AppContent() {
         onShowLogin={() => setView('login')}
         onShowSignup={() => setView('signup')}
         onShowMain={() => setView('main')}
+        onShowHistory={() => setView('history')}
       />
       
       {view === 'login' ? (
@@ -49,6 +51,8 @@ function AppContent() {
         <SignupPage 
           onSwitchToLogin={() => setView('login')} 
         />
+      ) : view === 'history' ? (
+        <HistoryPage />
       ) : (
         <>
           <Hero />
