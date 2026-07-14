@@ -37,14 +37,14 @@ export default function HistoryPage() {
       try {
         let res;
         try {
-          res = await fetch('http://localhost:5000/api/calculations', {
+          res = await fetch(`${import.meta.env.VITE_API_URL}/api/calculations`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
         } catch (directErr) {
-          console.warn('Direct fetch to http://localhost:5000 failed, trying proxy fallback', directErr);
+          console.warn(`Direct fetch to ${import.meta.env.VITE_API_URL} failed, trying proxy fallback`, directErr);
           res = await fetch('/api/calculations', {
             method: 'GET',
             headers: {

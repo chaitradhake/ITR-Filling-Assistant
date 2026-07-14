@@ -44,7 +44,7 @@ export default function TaxCalculator() {
     try {
       let res;
       try {
-        res = await fetch('http://localhost:5000/api/calculations', {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/api/calculations`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export default function TaxCalculator() {
           body: JSON.stringify(payload)
         });
       } catch (directErr) {
-        console.warn('Direct save to http://localhost:5000 failed, trying local proxy fallback', directErr);
+        console.warn(`Direct save to ${import.meta.env.VITE_API_URL} failed, trying local proxy fallback`, directErr);
         res = await fetch('/api/calculations', {
           method: 'POST',
           headers: {
@@ -137,7 +137,7 @@ export default function TaxCalculator() {
       let res;
       try {
         // Try calling the direct backend API URL first as specified
-        res = await fetch('http://localhost:5000/api/calculate-tax', {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/api/calculate-tax`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -145,7 +145,7 @@ export default function TaxCalculator() {
           body: JSON.stringify(payload)
         });
       } catch (directErr) {
-        console.warn('Direct connection to http://localhost:5000 failed, falling back to Vite proxy', directErr);
+        console.warn(`Direct connection to ${import.meta.env.VITE_API_URL} failed, falling back to Vite proxy`, directErr);
         // Transparent fallback to local proxy to circumvent CORS or networking blocks in different dev environments
         res = await fetch('/api/calculate-tax', {
           method: 'POST',

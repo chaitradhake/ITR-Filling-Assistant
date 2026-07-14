@@ -36,7 +36,7 @@ export default function LoginPage({ onSwitchToSignup, onLoginSuccess }) {
     try {
       let res;
       try {
-        res = await fetch('http://localhost:5000/api/auth/login', {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ export default function LoginPage({ onSwitchToSignup, onLoginSuccess }) {
           body: JSON.stringify({ email, password })
         });
       } catch (directErr) {
-        console.warn('Direct connection to http://localhost:5000 failed, falling back to local proxy', directErr);
+        console.warn(`Direct connection to ${import.meta.env.VITE_API_URL} failed, falling back to local proxy`, directErr);
         res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: {
