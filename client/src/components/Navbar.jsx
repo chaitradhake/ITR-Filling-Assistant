@@ -18,35 +18,35 @@ export default function Navbar({ onShowLogin, onShowSignup, onShowMain, onShowHi
         </div>
         <nav className="hidden md:flex gap-lg items-center">
           <a 
-            onClick={(e) => { e.preventDefault(); onShowMain(); }}
+            onClick={onShowMain}
             className="text-primary font-bold border-b-2 border-primary py-1 font-label-md text-label-md" 
             href="#home"
           >
             Home
           </a>
           <a 
-            onClick={(e) => { e.preventDefault(); onShowMain(); }}
+            onClick={onShowMain}
             className="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" 
             href="#how-it-works"
           >
             How It Works
           </a>
           <a 
-            onClick={(e) => { e.preventDefault(); onShowMain(); }}
+            onClick={onShowMain}
             className="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" 
             href="#calculator"
           >
             Tax Comparison
           </a>
           <a 
-            onClick={(e) => { e.preventDefault(); onShowMain(); }}
+            onClick={onShowMain}
             className="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" 
             href="#features"
           >
             Features
           </a>
           <a 
-            onClick={(e) => { e.preventDefault(); onShowMain(); }}
+            onClick={onShowMain}
             className="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" 
             href="#faq"
           >
