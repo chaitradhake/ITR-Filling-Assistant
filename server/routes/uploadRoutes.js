@@ -65,10 +65,19 @@ router.post('/upload', (req, res) => {
 
     try {
       const extractedData = await extractForm16Data(req.file.path, req.file.mimetype);
+      
+      if (!extractedData.isForm16) {
+        return res.status(400).json({
+          error: "This doesn't appear to be a valid Form 16 document. Please upload a correct Form 16 PDF or image."
+        });
+      }
+
+      const { isForm16, ...numericData } = extractedData;
+
       return res.status(200).json({
         message: 'File uploaded and processed successfully',
         filename: req.file.filename,
-        extractedData
+        extractedData: numericData
       });
     } catch (extractionError) {
       return res.status(200).json({
