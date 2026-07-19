@@ -1,35 +1,33 @@
 # TaxCompare — ITR Filing Assistant
 
-A MERN stack web app that helps salaried individuals in India compare the **Old vs New Tax Regime** and understand which one saves them more money. Users upload their Form 16, have the key details auto-extracted by AI, review/edit them, and get a clear tax comparison.
+A full-stack MERN application that helps salaried individuals in India compare the **Old vs New Tax Regime** and identify which one minimizes their tax liability. Users can either upload their Form 16 — with key details auto-extracted by AI — or enter their numbers manually, and get an instant, side-by-side tax comparison.
 
-> ⚠️ This project is a work in progress.
+🔗 **Live app:** https://itr-filling-assistant.vercel.app/
+🔗 **Live API:** https://itr-filling-assistant.onrender.com
 
-## What this project does
+> This is a **decision-support tool**, not an official tax filing service. It does not file returns with the government.
+>
+> Note: the backend runs on Render's free tier, which spins down after periods of inactivity — the first request after idle time may take 30-60 seconds to respond while the server wakes up.
 
-1. User uploads their Form 16 (PDF/image) ✅ **built**
-2. AI (Gemini Vision API) extracts salary, TDS, and deduction details ✅ **built**
-3. User reviews and corrects the extracted data ✅ **built**
-4. App calculates tax under both Old and New regime using official FY 2025-26 slab rules ✅ **built**
-5. App shows a side-by-side comparison and recommends the better regime ✅ **built**
+## Features
 
-This is a **decision-support tool**, not an official tax filing service. It does not file returns with the government.
-
-## Currently working
-
-- Full end-to-end flow: **upload Form 16 → AI extracts data → editable review screen → tax comparison**
-- Tax calculation engine (Old vs New regime, FY 2025-26 rules, Section 87A rebate, 4% cess)
-- `/api/calculate-tax` endpoint returning a full regime comparison
-- `/api/upload` endpoint — accepts a Form 16 (PDF/JPG/PNG), validates type/size, and runs it through Gemini Vision to extract salary, TDS, and deduction details as structured JSON
-- Editable review screen — extracted values are pre-filled but fully editable before calculation, so users can correct any AI misreads
-- Manual entry calculator UI — enter income & deductions directly, get an instant Old vs New comparison
-- Tab navigation between "Upload Form 16" and "Enter Details Manually" flows
+- **AI-powered document extraction** — upload a Form 16 (PDF/JPG/PNG) and Google Gemini Vision extracts gross salary, TDS, and deduction details automatically
+- **Editable review step** — extracted values are shown in an editable form before calculation, so users can correct any AI misreads rather than trusting extraction blindly
+- **Manual entry mode** — skip the upload and enter income/deductions directly
+- **Old vs New regime comparison** — full tax calculation engine built on official FY 2025-26 slab rates, standard deduction, and Section 87A rebate rules for both regimes
+- **User accounts** — signup/login with JWT authentication and bcrypt password hashing
+- **Save & view history** — logged-in users can save calculations and revisit them later
+- **Responsive landing page** — hero, features, how-it-works, FAQ, and a fully working calculator, all in one page with smooth-scroll navigation
 
 ## Tech stack
 
 - **Frontend:** React (Vite), Tailwind CSS
-- **Backend:** Node.js, Express, Multer (file uploads)
-- **AI:** Google Gemini API (document/vision extraction of Form 16 data)
-- **Planned:** MongoDB (saving past calculations), JWT-based auth, recharts (comparison visuals)
+- **Backend:** Node.js, Express
+- **Database:** MongoDB (Atlas), Mongoose
+- **Auth:** JWT, bcrypt
+- **AI:** Google Gemini API (Vision-based document extraction)
+- **File uploads:** Multer
+- **Deployment:** Vercel (frontend), Render (backend)
 
 ## Project structure
 
@@ -37,19 +35,40 @@ This is a **decision-support tool**, not an official tax filing service. It does
 itr-filing-assistant/
 ├── client/
 │   └── src/
+│       ├── context/
+│       │   └── AuthContext.jsx       # Global auth state (user, token, login/logout)
 │       └── components/
-│           ├── TaxCalculator.jsx    # Manual entry calculator UI, wired to /api/calculate-tax
-│           └── UploadForm16.jsx     # Upload → AI extraction → editable review → calculation flow
+│           ├── Navbar.jsx
+│           ├── Hero.jsx
+│           ├── WhyChoose.jsx
+│           ├── HowItWorks.jsx
+│           ├── TaxCalculator.jsx     # Manual entry calculator, wired to /api/calculate-tax
+│           ├── UploadForm16.jsx      # Upload → AI extraction → editable review → calculation
+│           ├── FAQ.jsx
+│           ├── CtaBanner.jsx
+│           ├── Footer.jsx
+│           ├── SignupPage.jsx
+│           ├── LoginPage.jsx
+│           └── HistoryPage.jsx       # View past saved calculations
 ├── server/
+│   ├── config/
+│   │   └── db.js                    # MongoDB connection
+│   ├── middleware/
+│   │   └── authMiddleware.js        # JWT verification, protects routes
+│   ├── models/
+│   │   ├── User.js
+│   │   └── Calculation.js
 │   ├── routes/
-│   │   ├── taxRoutes.js            # /api/calculate-tax endpoint
-│   │   └── uploadRoutes.js         # /api/upload endpoint
+│   │   ├── authRoutes.js            # /api/auth/signup, /api/auth/login
+│   │   ├── taxRoutes.js             # /api/calculate-tax
+│   │   ├── uploadRoutes.js          # /api/upload
+│   │   └── calculationRoutes.js     # /api/calculations (save & fetch history)
 │   ├── services/
-│   │   └── geminiExtraction.js     # Sends uploaded document to Gemini, returns structured JSON
+│   │   └── geminiExtraction.js      # Sends uploaded document to Gemini, returns structured JSON
 │   ├── utils/
-│   │   ├── taxCalculator.js        # Old vs New regime tax logic
-│   │   └── taxCalculator.test.js   # Manual test cases (run with: node utils/taxCalculator.test.js)
-│   └── uploads/                    # Uploaded files (gitignored, not committed)
+│   │   ├── taxCalculator.js         # Old vs New regime tax logic
+│   │   └── taxCalculator.test.js    # Manual test cases
+│   └── uploads/                     # Uploaded files (gitignored, not committed)
 └── README.md
 ```
 
@@ -61,10 +80,12 @@ cd server
 npm install
 npm run dev
 ```
-Requires a `.env` file in `/server` with:
+Requires a `.env` file in `/server`:
 ```
 PORT=5000
-GEMINI_API_KEY=your_gemini_api_key_here
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_random_secret_string
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
 **Client:**
@@ -73,24 +94,29 @@ cd client
 npm install
 npm run dev
 ```
+Requires a `.env` file in `/client`:
+```
+VITE_API_URL=http://localhost:5000
+```
 
 ## API reference
 
-### `POST /api/calculate-tax`
+### `POST /api/auth/signup`
+**Body:** `{ name, email, password }`
+**Response (201):** `{ message, userId }`
 
-**Request body:**
+### `POST /api/auth/login`
+**Body:** `{ email, password }`
+**Response (200):** `{ message, token, user: { name, email } }`
+
+### `POST /api/calculate-tax`
+**Body:**
 ```json
 {
   "income": 1300000,
-  "deductions": {
-    "section80C": 150000,
-    "section80D": 25000,
-    "hraExemption": 0,
-    "otherDeductions": 0
-  }
+  "deductions": { "section80C": 150000, "section80D": 25000, "hraExemption": 0, "otherDeductions": 0 }
 }
 ```
-
 **Response:**
 ```json
 {
@@ -100,12 +126,10 @@ npm run dev
   "savings": 58500
 }
 ```
-
-`deductions` is optional — if omitted, all values default to 0.
+`deductions` is optional — defaults to all zeros if omitted.
 
 ### `POST /api/upload`
-
-Accepts a single file under the field name `form16`. Only PDF, JPG, and PNG files are accepted, up to 5MB. The file is passed to Gemini Vision, which extracts key figures as structured JSON.
+Accepts a single file under field name `form16` (PDF/JPG/PNG, up to 5MB). Runs the file through Gemini Vision extraction.
 
 **Response (success):**
 ```json
@@ -123,19 +147,18 @@ Accepts a single file under the field name `form16`. Only PDF, JPG, and PNG file
 }
 ```
 
-**Response (upload succeeds, extraction fails):**
-```json
-{
-  "message": "File uploaded and processed successfully",
-  "filename": "...",
-  "extractionError": "Failed to parse extracted data from document"
-}
-```
+### `POST /api/calculations` *(requires Authorization: Bearer &lt;token&gt;)*
+**Body:** `{ income, deductions, oldRegimeTax, newRegimeTax, recommendedRegime, savings }`
+Saves a calculation for the logged-in user.
+
+### `GET /api/calculations` *(requires Authorization: Bearer &lt;token&gt;)*
+Returns all saved calculations for the logged-in user, newest first.
 
 ## Known simplifications
-- Surcharge and marginal relief (only relevant above ₹50 lakh income) are not implemented in the current tax calculator — a deliberate scope decision for this stage of the project.
-- Section 87A rebate is implemented as a flat "nil tax below threshold" rule rather than the precise marginal-relief calculation right at the boundary.
-- AI extraction is not always perfectly accurate (e.g. it can occasionally bundle standard deduction or professional tax into "other deductions" instead of leaving it at 0) — this is exactly why the review screen lets users correct values before calculating, rather than trusting extraction blindly.
+- Surcharge and marginal relief (only relevant above ₹50 lakh income) are not implemented — a deliberate scope decision for this project.
+- Section 87A rebate is implemented as a flat "nil tax below threshold" rule rather than precise marginal-relief calculation at the exact boundary.
+- AI extraction is not always perfectly accurate (e.g. it can occasionally bundle standard deduction or professional tax into "other deductions") — this is exactly why the editable review screen exists, rather than trusting extraction blindly.
+- JWT is currently stored in memory (React state) rather than persisted, so users are logged out on a full page refresh. A production version would use httpOnly cookies for persistent, secure sessions.
 
 ## Tax rules reference (FY 2025-26)
 
@@ -163,3 +186,6 @@ Section 87A rebate: nil tax if taxable income ≤ ₹12,00,000 (rebate capped at
 Section 87A rebate: nil tax if taxable income ≤ ₹5,00,000 (rebate capped at ₹12,500).
 
 4% health & education cess applies on top of computed tax in both regimes.
+
+## Built by
+Chaitra Dhake — [GitHub](https://github.com/chaitradhake) · [LinkedIn](https://www.linkedin.com/in/chaitradhake/) · [Portfolio](https://portfolio-chaitradhake.vercel.app/)
