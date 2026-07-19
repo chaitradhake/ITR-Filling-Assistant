@@ -68,7 +68,7 @@ router.post('/upload', (req, res) => {
       
       if (!extractedData.isForm16) {
         return res.status(400).json({
-          error: "This doesn't appear to be a valid Form 16 document. Please upload a correct Form 16 PDF or image."
+          error: "This doesn't look like a Form 16 document, so we can't calculate your ITR from it. Please upload a valid Form 16 PDF or image (Part A and/or Part B) to continue."
         });
       }
 
